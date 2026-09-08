@@ -1,0 +1,29 @@
+name: npm
+
+# on a published github release, when the repository variable NPM_TRUSTED_PUBLISHING is "yes":
+# build, test and publish to npm with provenance through trusted publishing (github hands npm a
+# short-lived oidc token; no npm token is stored anywhere). until the variable is set the job is
+# skipped and `npm install github:alinaschanz/gasweek-js` stays the way in.
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    if: vars.NPM_TRUSTED_PUBLISHING == 'yes'
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm test
+      - run: npm publish --provenance --access public
