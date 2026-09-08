@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>gasweek in the browser</title>
+<pre id="out">fetching a day of blocks from a public node…</pre>
+<script type="module">
+  // after `npm run build`, serve the repository root and open this file
+  import { gasweek, table } from "../dist/src/index.js";
+  const out = document.getElementById("out");
+  try {
+    const { rows, summary } = await gasweek({ hours: 24 });
+    out.textContent = table(rows, 0) + "\n\nblob median " + summary.blobMedian + " gwei";
+  } catch (err) {
+    out.textContent = "no luck: " + err.message;
+  }
+</script>
